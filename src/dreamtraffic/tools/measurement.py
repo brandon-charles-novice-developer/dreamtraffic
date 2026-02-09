@@ -10,7 +10,7 @@ from claude_agent_sdk import tool
 from dreamtraffic.measurement.vendors import get_vendor_config, VENDORS
 from dreamtraffic.measurement.vast import VastGenerator
 from dreamtraffic.measurement.fee_stack import FeeStackCalculator
-from dreamtraffic.db.engine import execute, fetch_one
+from dreamtraffic.db import supabase_client
 
 
 @tool(
@@ -19,7 +19,7 @@ from dreamtraffic.db.engine import execute, fetch_one
     {"creative_id": int, "vendors": str},
 )
 async def generate_vast_tag(args: dict[str, Any]) -> dict[str, Any]:
-    creative = fetch_one("SELECT * FROM creatives WHERE id = ?", (args["creative_id"],))
+    creative = supabase_client.get_creative(args["creative_id"])
     if creative is None:
         return {"content": [{"type": "text", "text": f"Creative {args['creative_id']} not found"}]}
 
@@ -39,9 +39,10 @@ async def generate_vast_tag(args: dict[str, Any]) -> dict[str, Any]:
 
     # Store VAST URL reference and measurement config
     vast_url = f"https://vast.dreamtraffic.demo/inline/{args['creative_id']}"
-    execute(
-        "UPDATE creatives SET vast_url = ?, measurement_config = ? WHERE id = ?",
-        (vast_url, json.dumps(vendor_keys), args["creative_id"]),
+    supabase_client.update_creative(
+        args["creative_id"],
+        vast_url=vast_url,
+        measurement_config=json.dumps(vendor_keys),
     )
 
     return {"content": [{"type": "text", "text": vast_xml}]}

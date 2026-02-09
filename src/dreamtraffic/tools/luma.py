@@ -7,7 +7,7 @@ from typing import Any
 from claude_agent_sdk import tool
 
 from dreamtraffic.luma.client import LumaClient
-from dreamtraffic.db.engine import execute, fetch_one
+from dreamtraffic.db import supabase_client
 
 
 @tool(
@@ -24,10 +24,21 @@ async def generate_video(args: dict[str, Any]) -> dict[str, Any]:
     )
     # Store generation reference
     if args.get("campaign_id"):
-        execute(
-            """INSERT INTO creatives (campaign_id, prompt, luma_generation_id, approval_status)
-               VALUES (?, ?, ?, 'draft')""",
-            (args["campaign_id"], args["prompt"], gen_id),
+        supabase_client.insert_creative(
+            campaign_id=args["campaign_id"],
+            name="",
+            luma_generation_id=gen_id,
+            prompt=args["prompt"],
+            video_url="",
+            duration_seconds=0,
+            width=1920,
+            height=1080,
+            aspect_ratio="16:9",
+            format="mp4",
+            placement_type="olv",
+            approval_status="draft",
+            measurement_config="",
+            vast_url="",
         )
     return {"content": [{"type": "text", "text": f"Generation started: {gen_id}"}]}
 
@@ -43,10 +54,7 @@ async def poll_generation(args: dict[str, Any]) -> dict[str, Any]:
     video_url = result.get("video_url", "")
 
     if args.get("creative_id") and video_url:
-        execute(
-            "UPDATE creatives SET video_url = ? WHERE id = ?",
-            (video_url, args["creative_id"]),
-        )
+        supabase_client.update_creative(args["creative_id"], video_url=video_url)
 
     return {"content": [{"type": "text", "text": f"Generation complete. Video URL: {video_url}"}]}
 

@@ -29,7 +29,7 @@ Built with the **Claude Agent SDK** using four specialized agents:
 | Trafficking Manager | Sonnet | VAST generation, multi-DSP upload, audit tracking |
 | Supply Chain Analyst | Haiku | Fee stacks, supply path optimization, ADSP advantage |
 
-Each agent uses custom MCP tools (22 total) backed by SQLite, real VAST 4.2 XML generation, and simulated DSP/exchange/SSP integrations.
+Each agent uses custom MCP tools (22 total) backed by Supabase PostgreSQL, real VAST 4.2 XML generation, and simulated DSP/exchange/SSP integrations.
 
 ## Quick Start
 
@@ -37,10 +37,18 @@ Each agent uses custom MCP tools (22 total) backed by SQLite, real VAST 4.2 XML 
 # Install
 uv sync
 
-# Initialize database with seed data
-dreamtraffic init-db
+# Set up environment variables (copy .env.example to .env)
+cp .env.example .env
+# Edit .env and add your API keys:
+#   - ANTHROPIC_API_KEY (required for Claude agents)
+#   - LUMAAI_API_KEY (required for video generation)
+#   - VITE_SUPABASE_URL (required for database)
+#   - VITE_SUPABASE_ANON_KEY (required for database)
 
-# Run the full demo pipeline (no API keys needed)
+# Database is automatically initialized via Supabase migrations
+# Reference data (DSP specs, supply paths) is pre-seeded
+
+# Run the full demo pipeline
 dreamtraffic demo
 
 # View pipeline status
@@ -73,7 +81,7 @@ dreamtraffic approve --creative-id 1 --action approve
 |-----------|--------|
 | Luma Dream Machine API | **Real** (requires API key) |
 | Claude Agent SDK agents | **Real** (requires Anthropic API key) |
-| SQLite database (6 tables) | **Real** |
+| Supabase PostgreSQL database (6 tables) | **Real** with Row Level Security |
 | VAST 4.2 XML with OMID AdVerification | **Real** — valid, parseable XML |
 | Approval state machine | **Real** |
 | Fee stack calculator | **Real** |
@@ -102,6 +110,32 @@ TTD Path:
 
 ADSP Advantage: 3% lower supply cost → margin for Luma creative generation
 ```
+
+## Database
+
+DreamTraffic uses **Supabase PostgreSQL** with Row Level Security for data persistence.
+
+### Schema
+
+Six tables with foreign key relationships:
+
+1. **campaigns** - Ad campaigns with flight dates, budgets, and creative briefs
+2. **creatives** - Generated video assets with approval status and measurement config
+3. **approval_events** - Audit trail of creative status changes during review workflow
+4. **trafficking_records** - DSP trafficking records with VAST URLs and audit status
+5. **supply_paths** - Pre-configured DSP→Exchange→SSP routing with fee schedules (reference data)
+6. **dsp_specs** - DSP specifications for format, duration, resolution requirements (reference data)
+
+### Security
+
+All tables have Row Level Security (RLS) enabled:
+- Public read access for campaigns, creatives, approval events, and trafficking records
+- Authenticated-only write access
+- Reference tables (supply_paths, dsp_specs) are public read-only
+
+### Migrations
+
+Database schema is managed via Supabase migrations in the MCP tool. Reference data (11 supply paths, 8 DSP specs) is automatically seeded.
 
 ## Testing
 

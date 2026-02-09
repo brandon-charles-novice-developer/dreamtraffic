@@ -7,7 +7,7 @@ from typing import Any
 
 from claude_agent_sdk import tool
 
-from dreamtraffic.db.engine import execute, fetch_one, fetch_all
+from dreamtraffic.db import supabase_client
 
 
 @tool(
@@ -26,17 +26,12 @@ from dreamtraffic.db.engine import execute, fetch_one, fetch_all
     },
 )
 async def create_campaign(args: dict[str, Any]) -> dict[str, Any]:
-    cursor = execute(
-        """INSERT INTO campaigns (name, advertiser, objective, audience, placements,
-           budget, flight_start, flight_end, brief)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (
-            args["name"], args["advertiser"], args["objective"],
-            args["audience"], args["placements"], args["budget"],
-            args["flight_start"], args["flight_end"], args["brief"],
-        ),
+    result = supabase_client.insert_campaign(
+        args["name"], args["advertiser"], args["objective"],
+        args["audience"], args["placements"], args["budget"],
+        args["flight_start"], args["flight_end"], args["brief"],
     )
-    return {"content": [{"type": "text", "text": f"Campaign created with ID: {cursor.lastrowid}"}]}
+    return {"content": [{"type": "text", "text": f"Campaign created with ID: {result['id']}"}]}
 
 
 @tool(
@@ -45,7 +40,7 @@ async def create_campaign(args: dict[str, Any]) -> dict[str, Any]:
     {"campaign_id": int},
 )
 async def get_campaign(args: dict[str, Any]) -> dict[str, Any]:
-    row = fetch_one("SELECT * FROM campaigns WHERE id = ?", (args["campaign_id"],))
+    row = supabase_client.get_campaign(args["campaign_id"])
     if row is None:
         return {"content": [{"type": "text", "text": f"Campaign {args['campaign_id']} not found"}]}
     return {"content": [{"type": "text", "text": json.dumps(row, indent=2)}]}
@@ -63,15 +58,23 @@ async def get_campaign(args: dict[str, Any]) -> dict[str, Any]:
     },
 )
 async def create_creative(args: dict[str, Any]) -> dict[str, Any]:
-    cursor = execute(
-        """INSERT INTO creatives (campaign_id, name, prompt, duration_seconds, placement_type)
-           VALUES (?, ?, ?, ?, ?)""",
-        (
-            args["campaign_id"], args["name"], args["prompt"],
-            args["duration_seconds"], args["placement_type"],
-        ),
+    result = supabase_client.insert_creative(
+        campaign_id=args["campaign_id"],
+        name=args["name"],
+        luma_generation_id="",
+        prompt=args["prompt"],
+        video_url="",
+        duration_seconds=args["duration_seconds"],
+        width=1920,
+        height=1080,
+        aspect_ratio="16:9",
+        format="mp4",
+        placement_type=args["placement_type"],
+        approval_status="draft",
+        measurement_config="",
+        vast_url="",
     )
-    return {"content": [{"type": "text", "text": f"Creative created with ID: {cursor.lastrowid}"}]}
+    return {"content": [{"type": "text", "text": f"Creative created with ID: {result['id']}"}]}
 
 
 @tool(
@@ -80,7 +83,7 @@ async def create_creative(args: dict[str, Any]) -> dict[str, Any]:
     {"creative_id": int},
 )
 async def get_creative(args: dict[str, Any]) -> dict[str, Any]:
-    row = fetch_one("SELECT * FROM creatives WHERE id = ?", (args["creative_id"],))
+    row = supabase_client.get_creative(args["creative_id"])
     if row is None:
         return {"content": [{"type": "text", "text": f"Creative {args['creative_id']} not found"}]}
     return {"content": [{"type": "text", "text": json.dumps(row, indent=2)}]}
@@ -92,8 +95,15 @@ async def get_creative(args: dict[str, Any]) -> dict[str, Any]:
     {"campaign_id": int},
 )
 async def list_creatives(args: dict[str, Any]) -> dict[str, Any]:
-    rows = fetch_all(
-        "SELECT id, name, approval_status, placement_type, duration_seconds FROM creatives WHERE campaign_id = ?",
-        (args["campaign_id"],),
-    )
-    return {"content": [{"type": "text", "text": json.dumps(rows, indent=2)}]}
+    rows = supabase_client.get_creatives(campaign_id=args["campaign_id"])
+    filtered = [
+        {
+            "id": r.get("id"),
+            "name": r.get("name"),
+            "approval_status": r.get("approval_status"),
+            "placement_type": r.get("placement_type"),
+            "duration_seconds": r.get("duration_seconds"),
+        }
+        for r in rows
+    ]
+    return {"content": [{"type": "text", "text": json.dumps(filtered, indent=2)}]}

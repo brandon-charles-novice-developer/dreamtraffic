@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dreamtraffic.db.models import ApprovalStatus
-from dreamtraffic.db.engine import execute, fetch_one, fetch_all
+from dreamtraffic.db import supabase_client
 
 # Valid state transitions
 TRANSITIONS: dict[str, list[str]] = {
@@ -26,7 +26,7 @@ class ApprovalWorkflow:
 
     def get_status(self, creative_id: int) -> str:
         """Get current approval status for a creative."""
-        row = fetch_one("SELECT approval_status FROM creatives WHERE id = ?", (creative_id,))
+        row = supabase_client.get_creative(creative_id)
         if row is None:
             raise ValueError(f"Creative {creative_id} not found")
         return row["approval_status"]
@@ -59,16 +59,11 @@ class ApprovalWorkflow:
             )
 
         # Update creative status
-        execute(
-            "UPDATE creatives SET approval_status = ? WHERE id = ?",
-            (to_status, creative_id),
-        )
+        supabase_client.update_creative(creative_id, approval_status=to_status)
 
         # Record audit event
-        execute(
-            """INSERT INTO approval_events (creative_id, from_status, to_status, reviewer, notes)
-               VALUES (?, ?, ?, ?, ?)""",
-            (creative_id, from_status, to_status, reviewer, notes),
+        supabase_client.insert_approval_event(
+            creative_id, from_status, to_status, reviewer, notes
         )
 
         return {
@@ -126,9 +121,5 @@ class ApprovalWorkflow:
 
     def get_audit_trail(self, creative_id: int) -> list[dict]:
         """Get the full audit trail for a creative."""
-        return fetch_all(
-            """SELECT * FROM approval_events
-               WHERE creative_id = ?
-               ORDER BY created_at ASC""",
-            (creative_id,),
-        )
+        events = supabase_client.get_approval_events(creative_id)
+        return sorted(events, key=lambda x: x.get("created_at", ""))

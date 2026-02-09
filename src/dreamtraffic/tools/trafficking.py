@@ -8,7 +8,7 @@ from typing import Any
 from claude_agent_sdk import tool
 
 from dreamtraffic.dsp import get_adapter
-from dreamtraffic.db.engine import execute, fetch_one, fetch_all
+from dreamtraffic.db import supabase_client
 
 
 @tool(
@@ -17,7 +17,7 @@ from dreamtraffic.db.engine import execute, fetch_one, fetch_all
     {"creative_id": int, "dsp": str},
 )
 async def traffic_creative(args: dict[str, Any]) -> dict[str, Any]:
-    creative = fetch_one("SELECT * FROM creatives WHERE id = ?", (args["creative_id"],))
+    creative = supabase_client.get_creative(args["creative_id"])
     if creative is None:
         return {"content": [{"type": "text", "text": f"Creative {args['creative_id']} not found"}]}
 
@@ -27,7 +27,7 @@ async def traffic_creative(args: dict[str, Any]) -> dict[str, Any]:
             f"Current status: {creative['approval_status']}"
         )}]}
 
-    campaign = fetch_one("SELECT * FROM campaigns WHERE id = ?", (creative["campaign_id"],))
+    campaign = supabase_client.get_campaign(creative["campaign_id"])
     campaign_name = campaign["name"] if campaign else "Unknown Campaign"
 
     adapter = get_adapter(args["dsp"])
@@ -42,18 +42,16 @@ async def traffic_creative(args: dict[str, Any]) -> dict[str, Any]:
     )
 
     # Record trafficking
-    execute(
-        """INSERT INTO trafficking_records
-           (creative_id, dsp, dsp_creative_id, dsp_asset_id, vast_url,
-            audit_status, placement_type, request_payload, response_payload)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (
-            args["creative_id"], result.dsp, result.creative_id,
-            result.asset_id, result.vast_url, result.audit_status,
-            result.placement_type,
-            json.dumps(result.request_payload),
-            json.dumps(result.response_payload),
-        ),
+    supabase_client.insert_trafficking_record(
+        creative_id=args["creative_id"],
+        dsp=result.dsp,
+        dsp_creative_id=result.creative_id,
+        dsp_asset_id=result.asset_id,
+        vast_url=result.vast_url,
+        audit_status=result.audit_status,
+        placement_type=result.placement_type,
+        request_payload=json.dumps(result.request_payload),
+        response_payload=json.dumps(result.response_payload),
     )
 
     return {"content": [{"type": "text", "text": json.dumps({
@@ -86,10 +84,8 @@ async def traffic_all_dsps(args: dict[str, Any]) -> dict[str, Any]:
     {"creative_id": int, "dsp": str},
 )
 async def check_dsp_audit(args: dict[str, Any]) -> dict[str, Any]:
-    record = fetch_one(
-        "SELECT * FROM trafficking_records WHERE creative_id = ? AND dsp = ?",
-        (args["creative_id"], args["dsp"]),
-    )
+    records = supabase_client.get_trafficking_records(creative_id=args["creative_id"])
+    record = next((r for r in records if r["dsp"] == args["dsp"]), None)
     if record is None:
         return {"content": [{"type": "text", "text": f"No trafficking record for creative {args['creative_id']} on {args['dsp']}"}]}
 
@@ -110,8 +106,15 @@ async def check_dsp_audit(args: dict[str, Any]) -> dict[str, Any]:
     {"creative_id": int},
 )
 async def get_trafficking_summary(args: dict[str, Any]) -> dict[str, Any]:
-    records = fetch_all(
-        "SELECT dsp, dsp_creative_id, audit_status, placement_type, created_at FROM trafficking_records WHERE creative_id = ?",
-        (args["creative_id"],),
-    )
-    return {"content": [{"type": "text", "text": json.dumps(records, indent=2)}]}
+    records = supabase_client.get_trafficking_records(creative_id=args["creative_id"])
+    filtered = [
+        {
+            "dsp": r.get("dsp"),
+            "dsp_creative_id": r.get("dsp_creative_id"),
+            "audit_status": r.get("audit_status"),
+            "placement_type": r.get("placement_type"),
+            "created_at": r.get("created_at"),
+        }
+        for r in records
+    ]
+    return {"content": [{"type": "text", "text": json.dumps(filtered, indent=2)}]}

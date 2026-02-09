@@ -143,3 +143,81 @@ Database schema is managed via Supabase migrations in the MCP tool. Reference da
 uv sync --extra dev
 pytest --cov
 ```
+
+## Deployment
+
+### Frontend (React Prototype)
+
+The frontend prototype is a static Vite application that can be deployed to any static hosting platform.
+
+#### Deploy to Vercel
+
+```bash
+cd prototype
+vercel --prod
+```
+
+Configure environment variables in Vercel dashboard:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+#### Deploy to Netlify
+
+```bash
+cd prototype
+netlify deploy --prod
+```
+
+Configure environment variables in Netlify dashboard:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+#### Manual Build
+
+```bash
+cd prototype
+npm install
+npm run build
+```
+
+The production build will be in `prototype/dist/` and can be served by any static file server.
+
+### Backend (Python CLI)
+
+The backend is a Python CLI application using Claude Agent SDK.
+
+#### Using Docker
+
+```bash
+docker build -t dreamtraffic .
+docker run -e LUMAAI_API_KEY=xxx -e ANTHROPIC_API_KEY=xxx \
+  -e VITE_SUPABASE_URL=xxx -e VITE_SUPABASE_ANON_KEY=xxx \
+  dreamtraffic dreamtraffic demo
+```
+
+#### Using Docker Compose
+
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+docker-compose up
+```
+
+#### Local Installation
+
+```bash
+uv sync
+source .venv/bin/activate
+dreamtraffic --help
+```
+
+### Environment Variables
+
+Required for production:
+
+| Variable | Description | Required For |
+|----------|-------------|--------------|
+| `LUMAAI_API_KEY` | Luma AI API key for video generation | Backend |
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude agents | Backend |
+| `VITE_SUPABASE_URL` | Supabase project URL | Frontend & Backend |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key | Frontend & Backend |

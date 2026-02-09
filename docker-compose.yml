@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dreamtraffic:
+    build: .
+    environment:
+      - LUMAAI_API_KEY=${LUMAAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    volumes:
+      - ./data:/app/data
+    command: dreamtraffic --help

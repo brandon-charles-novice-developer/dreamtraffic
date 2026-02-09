@@ -1,0 +1,20 @@
+export const creatives = [
+  {
+    id: 1,
+    name: '6s Social Video',
+    videoUrl: '/dreamtraffic-hero-6s.mp4',
+    lumaGenerationId: 'gen-dm-ray2-a8f3e1',
+    prompt: 'Cinematic shot of a confident young professional, warm golden light, modern office environment with holographic data displays. Camera slowly orbits revealing technology and human connection. Film grain, anamorphic bokeh. 4K.',
+    model: 'Ray2',
+    duration: 6,
+    width: 720,
+    height: 1280,
+    aspectRatio: '9:16',
+    format: 'mp4',
+    codec: 'H.264 + AAC',
+    fileSize: '2.8 MB',
+    placementType: 'social',
+    approvalStatus: 'active',
+    measurementVendors: ['IAS', 'MOAT', 'DoubleVerify'],
+  },
+]

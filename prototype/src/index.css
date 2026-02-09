@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgb(15 23 42);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(51 65 85);
+    border-radius: 3px;
+  }
+}
+
+.vast-xml {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.vast-xml .tag { color: #7dd3fc; }
+.vast-xml .attr { color: #c4b5fd; }
+.vast-xml .value { color: #86efac; }
+.vast-xml .text { color: #fde68a; }
+.vast-xml .comment { color: #64748b; }
+
+.flow-line {
+  stroke: rgb(59 130 246 / 0.5);
+  stroke-width: 2;
+  fill: none;
+}
+
+.flow-line-active {
+  stroke: rgb(34 197 94 / 0.7);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-dasharray: 8 4;
+  animation: flow 1.5s linear infinite;
+}
+
+@keyframes flow {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}

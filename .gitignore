@@ -11,3 +11,6 @@ data/*.json
 .pytest_cache/
 htmlcov/
 .coverage
+node_modules/
+prototype/dist/
+.DS_Store

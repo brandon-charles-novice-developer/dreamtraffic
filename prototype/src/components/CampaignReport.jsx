@@ -206,7 +206,7 @@ export default function CampaignReport() {
         <p className="text-[11px] text-slate-500">
           Report generated from DreamTraffic pipeline data. Impression estimates based on ${estimatedCpm} CPM
           across {totalPaths} supply paths. All DSP integrations use simulated API response shapes with realistic payloads.
-          Backend source available on GitHub.
+          Backend architecture built with Claude Agent SDK + Luma Dream Machine API.
         </p>
       </div>
     </div>

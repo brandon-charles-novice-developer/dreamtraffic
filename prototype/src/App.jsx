@@ -50,14 +50,6 @@ export default function App() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Pipeline Active
             </span>
-            <a
-              href="https://github.com/brandon-charles-novice-developer/dreamtraffic"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] text-slate-500 hover:text-slate-300 transition-colors px-2 py-1"
-            >
-              GitHub →
-            </a>
           </div>
         </div>
       </header>

@@ -5,7 +5,7 @@ export const dspStatuses = [
     creativeId: 'amzn-cr-7f2a4e8b1c3d',
     assetId: 'amzn-asset-9e1b3a5f7d2c',
     auditStatus: 'approved',
-    placementType: 'Social Video',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     features: [
       'Post-June 2025 reduced fee (12%)',
       'Certified Supply Exchange partners',
@@ -22,7 +22,7 @@ export const dspStatuses = [
     creativeId: 'ttd-cr-8a3b5c7d9e1f',
     assetId: 'ttd-asset-2b4c6d8e0f1a',
     auditStatus: 'approved',
-    placementType: 'Social Video',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     features: [
       'UID 2.0 targeting enabled',
       'Kokai AI optimization',
@@ -39,7 +39,7 @@ export const dspStatuses = [
     creativeId: 'dv360-cr-4d6e8f0a2b3c',
     assetId: 'dv360-asset-1a3b5c7d9e0f',
     auditStatus: 'approved',
-    placementType: 'Social Video',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     features: [
       'Two-step upload (asset → creative)',
       'Google creative review',
@@ -56,7 +56,7 @@ export const dspStatuses = [
     creativeId: 'sa-cr-5e7f9a1b3c4d',
     assetId: 'sa-asset-6f8a0b2c4d5e',
     auditStatus: 'under_review',
-    placementType: 'Social Video',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     features: [
       'Contextual targeting',
       'Household-level reach',
@@ -72,7 +72,7 @@ export const dspStatuses = [
     creativeId: 'adel-cr-7a9b1c3d5e6f',
     assetId: 'adel-asset-8b0c2d4e6f7a',
     auditStatus: 'under_review',
-    placementType: 'Social Video',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     features: [
       'Viant Household ID graph',
       'People-based targeting',

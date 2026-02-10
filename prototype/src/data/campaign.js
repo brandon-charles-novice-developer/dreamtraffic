@@ -4,7 +4,7 @@ export const campaign = {
   advertiser: 'Luma AI',
   objective: 'Brand awareness + consideration for Dream Machine',
   audience: 'Marketing decision makers, creative directors, agency planners',
-  placements: ['Social Video'],
+  placements: ['Social Video Repurposed for OLV Programmatic Activation'],
   budget: 250000,
   flightStart: '2026-03-01',
   flightEnd: '2026-04-30',

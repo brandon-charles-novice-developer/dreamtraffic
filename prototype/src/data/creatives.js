@@ -13,7 +13,7 @@ export const creatives = [
     format: 'mp4',
     codec: 'H.264 + AAC',
     fileSize: '2.8 MB',
-    placementType: 'social',
+    placementType: 'Social Video Repurposed for OLV Programmatic Activation',
     approvalStatus: 'active',
     measurementVendors: ['IAS', 'MOAT', 'DoubleVerify'],
   },

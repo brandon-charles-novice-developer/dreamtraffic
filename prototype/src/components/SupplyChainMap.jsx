@@ -1,43 +1,175 @@
 import { supplyPaths, dspComparison, lumaCpm, adspSavingsVsTtd } from '../data/supplyPaths'
+import { dspStatuses } from '../data/dspStatus'
 
 export default function SupplyChainMap() {
+  const approvedDsps = dspStatuses.filter(d => d.auditStatus === 'approved')
+  const reviewDsps = dspStatuses.filter(d => d.auditStatus !== 'approved')
+  const openExchangePaths = supplyPaths.filter(p => p.dealType === 'Open Exchange')
+  const pmpPaths = supplyPaths.filter(p => p.dealType === 'PMP')
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-white">Supply Chain Map</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-white">Supply Chain Map</h2>
+        <span className="text-xs text-slate-400">Social Video Repurposed for OLV Programmatic Activation</span>
+      </div>
 
-      {/* Visual Flow */}
+      {/* Step 1: DSP Readiness */}
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-        <h3 className="text-sm font-semibold text-white mb-5">Programmatic Supply Chain Flow</h3>
-        <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
-          {[
-            { label: 'Luma AI', sub: 'Dream Machine', color: 'from-blue-500 to-violet-500' },
-            { label: 'DSP', sub: 'ADSP / TTD / DV360', color: 'from-amber-500 to-orange-500' },
-            { label: 'Bidswitch', sub: 'T-Groups + SmartSwitch', color: 'from-cyan-500 to-blue-500' },
-            { label: 'SSP', sub: 'Magnite / PubMatic / Index', color: 'from-emerald-500 to-teal-500' },
-            { label: 'Publisher', sub: 'Impression Served', color: 'from-pink-500 to-rose-500' },
-          ].map((node, i, arr) => (
-            <div key={node.label} className="flex items-center gap-2 flex-shrink-0">
-              <div className="flex flex-col items-center">
-                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${node.color} flex items-center justify-center shadow-lg`}>
-                  <span className="text-white text-xs font-bold text-center leading-tight">{node.label}</span>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">STEP 1</span>
+          <h3 className="text-sm font-semibold text-white">DSP Readiness — Creative Audit Status</h3>
+        </div>
+        <p className="text-xs text-slate-400 mb-4">
+          Before activation, Dream Machine creative must pass each DSP's audit review. Once approved, the creative can serve via Open Exchange or PMP deals.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {dspStatuses.map((dsp) => {
+            const isApproved = dsp.auditStatus === 'approved'
+            return (
+              <div key={dsp.key} className={`rounded-lg p-3 border ${isApproved ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-amber-500/5 border-amber-500/20'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: dsp.color }} />
+                    <span className="text-sm font-medium text-slate-200">{dsp.dsp}</span>
+                  </div>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                    isApproved
+                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                      : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  }`}>
+                    {isApproved ? 'READY' : 'IN REVIEW'}
+                  </span>
                 </div>
-                <span className="text-[10px] text-slate-400 mt-2 text-center max-w-[90px]">{node.sub}</span>
+                <div className="text-[10px] text-slate-500 mt-1.5">
+                  {dsp.feeRate} platform fee · {isApproved ? 'Open Exchange + PMP eligible' : 'Pending audit approval'}
+                </div>
               </div>
-              {i < arr.length - 1 && (
-                <div className="flex items-center -mt-6">
-                  <div className="w-8 h-px bg-gradient-to-r from-slate-500 to-slate-600" />
-                  <span className="text-slate-500 text-xs">→</span>
-                  <div className="w-8 h-px bg-gradient-to-r from-slate-600 to-slate-500" />
-                </div>
-              )}
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Step 2: Activation Paths — Visual Flow */}
+      <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">STEP 2</span>
+          <h3 className="text-sm font-semibold text-white">Activation Paths — DSP to Impression</h3>
+        </div>
+        <p className="text-xs text-slate-400 mb-5">
+          Once approved, Dream Machine creative activates through multiple paths. Traffic directly in the DSP to reach Open Exchange inventory, route through Bidswitch or SmartSwitch to preferred SSPs, or execute PMP deals for premium guaranteed supply.
+        </p>
+
+        {/* Branching Flow Diagram */}
+        <div className="space-y-6">
+          {/* Source */}
+          <div className="flex justify-center">
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center shadow-lg">
+                <span className="text-white text-[10px] font-bold text-center leading-tight">Luma AI<br/>Dream Machine</span>
+              </div>
+              <div className="w-px h-5 bg-slate-600 mt-1" />
+              <span className="text-[9px] text-slate-500">VAST 4.2 wrapped creative</span>
+              <div className="w-px h-4 bg-slate-600" />
             </div>
-          ))}
+          </div>
+
+          {/* DSP Tier */}
+          <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/30">
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-3 text-center">Traffic in DSP</div>
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+              {dspStatuses.map((dsp) => {
+                const isApproved = dsp.auditStatus === 'approved'
+                return (
+                  <div key={dsp.key} className="flex flex-col items-center">
+                    <div className={`w-full h-10 rounded-lg flex items-center justify-center gap-1.5 border ${
+                      isApproved ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-700/30 border-slate-600/30'
+                    }`}>
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: dsp.color }} />
+                      <span className={`text-[10px] font-medium ${isApproved ? 'text-emerald-300' : 'text-slate-500'}`}>{dsp.dsp}</span>
+                    </div>
+                    <span className="text-[9px] text-slate-600 mt-1">{dsp.feeRate}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Branching: Exchange Routing + Deal Types */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Open Exchange Path */}
+            <div className="bg-slate-900/50 rounded-xl p-4 border border-blue-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-[10px] text-blue-300">⇄</div>
+                <div>
+                  <div className="text-xs font-semibold text-blue-300">Open Exchange</div>
+                  <div className="text-[10px] text-slate-500">Via Bidswitch</div>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {['Magnite', 'PubMatic', 'Index Exchange'].map((ssp) => (
+                  <div key={ssp} className="flex items-center justify-between py-1 px-2 rounded bg-slate-800/50">
+                    <span className="text-[11px] text-slate-300">{ssp}</span>
+                    <span className="text-[9px] text-blue-400">RTB</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* SmartSwitch Path */}
+            <div className="bg-slate-900/50 rounded-xl p-4 border border-cyan-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded bg-cyan-500/20 flex items-center justify-center text-[10px] text-cyan-300">⚡</div>
+                <div>
+                  <div className="text-xs font-semibold text-cyan-300">SmartSwitch</div>
+                  <div className="text-[10px] text-slate-500">ML-optimized routing</div>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {['Zeta Global', 'Magnite', 'PubMatic'].map((ssp) => (
+                  <div key={ssp} className="flex items-center justify-between py-1 px-2 rounded bg-slate-800/50">
+                    <span className="text-[11px] text-slate-300">{ssp}</span>
+                    <span className="text-[9px] text-cyan-400">PMP</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Direct / PMP Path */}
+            <div className="bg-slate-900/50 rounded-xl p-4 border border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center text-[10px] text-emerald-300">◎</div>
+                <div>
+                  <div className="text-xs font-semibold text-emerald-300">Direct / PMP Deal</div>
+                  <div className="text-[10px] text-slate-500">No exchange fee</div>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {['FreeWheel', 'Magnite PG', 'Index PG'].map((ssp) => (
+                  <div key={ssp} className="flex items-center justify-between py-1 px-2 rounded bg-slate-800/50">
+                    <span className="text-[11px] text-slate-300">{ssp}</span>
+                    <span className="text-[9px] text-emerald-400">Guaranteed</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Impression Delivery */}
+          <div className="flex justify-center">
+            <div className="flex flex-col items-center">
+              <div className="w-px h-4 bg-slate-600" />
+              <div className="w-48 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
+                <span className="text-white text-[10px] font-bold text-center leading-tight">Impression Served<br/>OLV Programmatic</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* DSP Comparison */}
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-        <h3 className="text-sm font-semibold text-white mb-4">DSP Fee Comparison</h3>
+        <h3 className="text-sm font-semibold text-white mb-4">DSP Fee Comparison — All Platforms</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -84,7 +216,7 @@ export default function SupplyChainMap() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* ADSP Path */}
           <div className="bg-emerald-500/5 rounded-lg p-4 border border-emerald-500/20">
-            <div className="text-xs font-semibold text-emerald-300 mb-3">Amazon DSP → Bidswitch → Magnite</div>
+            <div className="text-xs font-semibold text-emerald-300 mb-3">Amazon DSP → Bidswitch → Magnite (Open Exchange)</div>
             <div className="space-y-2 font-mono text-xs">
               <FeeRow label="Luma Creative Gen" value={`$${lumaCpm.toFixed(4)}/CPM`} sub="amortized" />
               <FeeRow label="Amazon DSP Fee" value="12.0%" amount="$1.20" highlight />
@@ -100,7 +232,7 @@ export default function SupplyChainMap() {
 
           {/* TTD Path */}
           <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/30">
-            <div className="text-xs font-semibold text-slate-300 mb-3">TTD → Bidswitch → Magnite</div>
+            <div className="text-xs font-semibold text-slate-300 mb-3">TTD → Bidswitch → Magnite (Open Exchange)</div>
             <div className="space-y-2 font-mono text-xs">
               <FeeRow label="Luma Creative Gen" value={`$${lumaCpm.toFixed(4)}/CPM`} sub="amortized" />
               <FeeRow label="TTD Platform Fee" value="15.0%" amount="$1.50" />
@@ -126,14 +258,15 @@ export default function SupplyChainMap() {
           costs at <span className="font-mono text-emerald-300">${lumaCpm.toFixed(4)}/CPM</span>.
         </p>
         <p className="text-sm text-slate-400 mt-3">
-          This is where Luma captures value in the supply chain: ADSP's lower fees create margin headroom
-          for premium AI-generated creative that wasn't economically viable at higher fee structures.
+          With {supplyPaths.length} activation paths across {dspComparison.length} DSPs — including Open Exchange, SmartSwitch, and Direct PMP deals —
+          Luma captures value wherever the impression serves. ADSP's lower fees create the margin headroom;
+          the breadth of SSP connectivity (Magnite, PubMatic, Index, Zeta, FreeWheel) ensures reach.
         </p>
       </div>
 
       {/* All Paths Table */}
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-        <h3 className="text-sm font-semibold text-white mb-4">All Supply Paths</h3>
+        <h3 className="text-sm font-semibold text-white mb-4">All Supply Paths ({supplyPaths.length})</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
@@ -141,6 +274,7 @@ export default function SupplyChainMap() {
                 <th className="pb-2 pr-3">DSP</th>
                 <th className="pb-2 pr-3">Exchange</th>
                 <th className="pb-2 pr-3">SSP</th>
+                <th className="pb-2 pr-3">Deal Type</th>
                 <th className="pb-2 pr-3">DSP Fee</th>
                 <th className="pb-2 pr-3">Exch Fee</th>
                 <th className="pb-2 pr-3">SSP Fee</th>
@@ -158,6 +292,15 @@ export default function SupplyChainMap() {
                     <td className="py-2 pr-3 text-slate-300">{p.dsp}</td>
                     <td className="py-2 pr-3 text-slate-400">{p.exchange}</td>
                     <td className="py-2 pr-3 text-slate-400">{p.ssp}</td>
+                    <td className="py-2 pr-3">
+                      <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${
+                        p.dealType === 'PMP'
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                          : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                      }`}>
+                        {p.dealType}
+                      </span>
+                    </td>
                     <td className="py-2 pr-3 text-slate-300">{p.dspFee}%</td>
                     <td className="py-2 pr-3 text-slate-400">{p.exchangeFee}%</td>
                     <td className="py-2 pr-3 text-slate-400">{p.sspFee}%</td>
